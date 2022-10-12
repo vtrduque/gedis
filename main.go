@@ -7,15 +7,17 @@ import (
 )
 
 func handleConnection(conn net.Conn) {
-	conn.Write([]byte("hey! :D"))
+	conn.Write([]byte("+PONG\r\n"))
 }
 
 func main() {
-	l, err := net.Listen("tcp", "0.0.0.0:6379")
+	l, err := net.Listen("tcp", "localhost:6379")
 	if err != nil {
 		fmt.Println("Error binding port 6379 - ", err.Error())
 		os.Exit(1)
 	}
+
+	fmt.Println("Gedis started!")
 
 	for {
 		conn, err := l.Accept()
