@@ -3,8 +3,8 @@ Go implementation of Redis for **study purposes** =)
 
 Implementation list:
 
-- [ ] TCP server
-- [ ] PING
+- [x] TCP server
+- [x] PING
 - [ ] ECHO
 - [ ] SET and GET
 - [ ] Integration test/e2e with redis client
