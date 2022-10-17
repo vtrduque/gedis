@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"syscall"
 	"testing"
 	"time"
@@ -31,6 +32,8 @@ func TestPing(t *testing.T) {
 	if ping.Val() != "PONG" {
 		t.Errorf("Expected \"PONG\", got %s", ping.Val())
 	}
+
+	r.Close()
 
 	err := cmd.Process.Signal(syscall.SIGTERM)
 
@@ -74,6 +77,51 @@ func TestPingMultipleClients(t *testing.T) {
 	if ping2.Val() != "PONG" {
 		t.Errorf("Expected \"PONG\", got %s", ping.Val())
 	}
+
+	rdb.Close()
+	rdb2.Close()
+
+	err := cmd.Process.Signal(syscall.SIGTERM)
+
+	if err != nil {
+		t.Error("failed to terminate gedis process")
+	}
+}
+
+func TestMultiplePing(t *testing.T) {
+	cmd := newGedisCmd()
+
+	r := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	time.Sleep(2 * time.Second)
+
+	ping := r.Ping(ctx)
+	ping2 := r.Ping(ctx)
+
+	fmt.Println(ping.Val())
+	fmt.Println(ping2.Val())
+
+	if ping.Err() != nil {
+		t.Errorf("can't ping gedis: %s", ping.Err())
+	}
+
+	if ping.Val() != "PONG" {
+		t.Errorf("Expected \"PONG\", got %s", ping.Val())
+	}
+
+	if ping2.Err() != nil {
+		t.Errorf("can't ping gedis: %s", ping.Err())
+	}
+
+	if ping2.Val() != "PONG" {
+		t.Errorf("Expected \"PONG\", got %s", ping.Val())
+	}
+
+	r.Close()
 
 	err := cmd.Process.Signal(syscall.SIGTERM)
 
